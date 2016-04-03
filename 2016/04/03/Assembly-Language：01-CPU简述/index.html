@@ -2,7 +2,7 @@
 <p>之后我们可以把十进制数转换成二进制数，也能把二进制数还原成十进制数，所以人们又发明了普通的计算机。后来，我们发现只要给每个文字都编上号（即文字编码） ，就可以建立一个文字与数字的对应关系，从而就可以把文字也转换成电信号，让CPU来处理文章（比如进行文字输入或者字词检索等） 。</p>
 <p>依此类推，人们接着又找到了将图像、音乐等等转换成电信号的方法，使CPU的应用范围越来越广。<strong>不过CPU还是一如既往，只能处理电信号</strong>。</p>
 <h2 id="数据与程序"><a href="#数据与程序" class="headerlink" title="数据与程序"></a>数据与程序</h2><p>CPU是一个只能处理电信号的部件，然而却是计算机最核心的东西，控制整个计算机的运作并进行运算。不过想要让它工作，就必须想它提供指令和数据。然而数据与程序却是没有什么区别的。比如，内存中的一串二进制信息 1000100111011000 ，CPU既可以把它当作数据，可以看作是指令来进行执行。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1000100111011000    89D8H      ;数据</span><br><span class="line">1000100111011000    mov ax, bx ;程序</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1000100111011000B    89D8H      ;数据</span><br><span class="line">1000100111011000B    mov ax, bx ;程序</span><br></pre></td></tr></table></figure>
 <h2 id="对存储器的读写"><a href="#对存储器的读写" class="headerlink" title="对存储器的读写"></a>对存储器的读写</h2><p>存储器基本知识：存储器会被划分为若干个存储单元，每个存储单元（Byte）是从0开始依次编号，例如一个存储器有128个存储单元，则编号为0~127。而八个Bit位组成一个Byte，也就是通常说的一个字节。</p>
 <p>好，通过上面，我们简单了解到了存储单元的概念。而CPU要从存储器中读写数据时，就需要指定存储单元的地址，也就是说他要先确定读取的是哪一个存储单元的数据。所以，CPU在读写数据的时候，必须和外部的器件进行三类信息交互。</p>
 <ul>
@@ -10,9 +10,8 @@
 <li>器件的选择，读或者是写的命令（控制信息）</li>
 <li>读写的数据（数据信息）</li>
 </ul>
-<p>以下为有10根地址线的CPU发送数据时的情景：<br><img src="http://pic002.cnblogs.com/images/2012/390495/2012060812461641.png" alt=""></p>
-<p><strong>小结</strong>：</p>
-<ul>
+<p>以下是具有10根地址总线的CPU发送地址时的情景：<br><img src="http://pic002.cnblogs.com/images/2012/390495/2012060812461641.png" alt=""></p>
+<h2 id="小结："><a href="#小结：" class="headerlink" title="小结："></a>小结：</h2><ul>
 <li>汇编指令是机器指令的助记符，同机器指令一一对应</li>
 <li>每一种CPU都有自己的指令集</li>
 <li>在存储器上，指令和数据没有任何区别，都是二进制信息。所以数据与指令，可以依据不同的寄存器，进行转换</li>
