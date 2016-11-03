@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="个人博客"><title>内功修炼：程序是如何运行起来的 | Torival's blog</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/3.0.3/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">内功修炼：程序是如何运行起来的</h1><a id="logo" href="/.">Torival's blog</a><p class="description">Things are beautiful if you love them</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">内功修炼：程序是如何运行起来的</h1><div class="post-meta">Nov 3, 2016<span> | </span><span class="category"><a href="/categories/Science/">Science</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> Hits</span></span></div><a data-disqus-identifier="2016/11/03/how-did-the-program-work/" href="/2016/11/03/how-did-the-program-work/#disqus_thread" class="disqus-comment-count"></a><div class="post-content"><p>对于任何一个学习过C语言的来说，“HelloWorld”程序都不会陌生。因为它应该是你打开新世界的看到的第一束光。至今我还记得第一次敲出这个程序的时候激动了好久。但是你们知道短短的几行代码，是怎么让程序运行起来的么？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// hello.c</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Hello World!\n"</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>程序是如何运行起来的？很多人可能会说，不就是五个步骤：<strong>预处理（Prepressing）</strong>，<em>编译（Compilation）</em>，<strong>汇编（Assembly）</strong>和<strong>链接（Linking）</strong>，<strong>装载（Loading）</strong>么？是这样的。但是你知道每一步背后都做过一些什么吗？如果你能回答上以下的问题，我想这个文章就没有必要看下去了。</p>
+<ul>
+<li><p>在main()函数调用之前，程序做过一些什么？</p>
+</li>
+<li><p>编译出来的可执行文件里面有什么，在内存中是什么样子的，是怎么来组织的？</p>
+</li>
+<li><p>静态链接、动态链接，有什么区别？</p>
+</li>
+<li><p>不同的编译器（Micrsoft VC/VS, GCC）和不同的硬件平台（X86，SPARC，MIPS，ARM），以及不同的操作系统（Windows，Linux，Unix，Solaris），最终编译出来的结果一样么？</p>
+</li>
+<li><p>ELF文件，PE文件，COFF文件，是什么？</p>
+</li>
+</ul>
+<p>如果你发现对其中的一些问题，不是很了解的话，甚至没有想过这些问题的时候，而你有向了解一下，那么就可以，跟着我的步伐一步俩步，往下看啦。这个文章是为你准备的。需要声明的是，本文主要针对gcc编译器，也就是针对C和C++，不一定适用于其他语言的编译。下图为总览。</p>
+<p><img src="/img/3038567-04b18ad0cb851286.jpg" alt="GCC编译过程"></p>
+<h2 id="预处理"><a href="#预处理" class="headerlink" title="预处理"></a>预处理</h2><p>预处理的过程，其实，主要是处理那些源代码中以<code>#</code>开始的预编译指令。比如<code>#include</code>，<code>#define</code>等，处理的规则如下：</p>
+<ul>
+<li><p>将所有的<code>#define</code>删除，并且展开所有的宏定义</p>
+</li>
+<li><p>处理所有的条件预编译指令，比如<code>#if</code>， <code>#ifdef</code>， <code>#elif</code>， <code>#else</code>， <code>#endif</code>等</p>
+</li>
+<li><p>处理<code>#include</code>预编译指令，将被包含的文件插入到该预编译指令的位置。在这个插入的过程中，是递归进行的，也就是说被包含的文件，可能还包含其他文件。</p>
+</li>
+<li><p>删除所有注释 <code>//</code>和<code>/**/</code>.</p>
+</li>
+<li><p>添加行号和文件标识，以便编译时产生调试用的行号及编译错误警告行号。</p>
+</li>
+<li>保留所有的<code>#pragma</code>编译器指令，因为编译器需要使用它们。</li>
+</ul>
+<p>对于第一步预编译的过程，可以通过以下方式完成：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -E hello.c -o hello.i</span><br></pre></td></tr></table></figure></p>
+<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cpp hello.c &gt; hello.i</span><br></pre></td></tr></table></figure></p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>编译过程可分为6步：词法分析、语法分析、语义分析、源代码优化、代码生成、目标代码优化。对应与下图的每一步。下面我们以一个具体的表达式进行分析：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">array[index] = (index + 4)*(2 + 6);</span><br></pre></td></tr></table></figure></p>
+<p><img src="/img/3038567-4d45792af06e0aaf.png" alt="Compilation"></p>
+<ul>
+<li>词法分析：扫描器（Scanner）将源代的字符序列分割成一系列的记号（Token）。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>记号</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>array</td>
+<td>标记符</td>
+</tr>
+<tr>
+<td>[</td>
+<td>左方括号</td>
+</tr>
+<tr>
+<td>index</td>
+<td>标记符</td>
+</tr>
+<tr>
+<td>]</td>
+<td>右标记符</td>
+</tr>
+<tr>
+<td>=</td>
+<td>赋值</td>
+</tr>
+<tr>
+<td>(</td>
+<td>左圆括号</td>
+</tr>
+<tr>
+<td>index</td>
+<td>标记符</td>
+</tr>
+<tr>
+<td>+</td>
+<td>加号</td>
+</tr>
+<tr>
+<td>4</td>
+<td>数字</td>
+</tr>
+<tr>
+<td>)</td>
+<td>右圆括号</td>
+</tr>
+<tr>
+<td>*</td>
+<td>乘号</td>
+</tr>
+<tr>
+<td>(</td>
+<td>左圆括号</td>
+</tr>
+<tr>
+<td>2</td>
+<td>数字</td>
+</tr>
+<tr>
+<td>+</td>
+<td>加号</td>
+</tr>
+<tr>
+<td>6</td>
+<td>数字</td>
+</tr>
+<tr>
+<td>)</td>
+<td>右圆括号</td>
+</tr>
+</tbody>
+</table>
+<pre><code>注：lex工具，可实现按照用户描述的词法规则将输入的字符串分割为一个一个记号。
+</code></pre><ul>
+<li><p>语法分析：语法分析器将记号（Token）产生语法树（Syntax Tree）。</p>
+<p>  <img src="/img/3038567-9eed50bccd4d5979.png" alt="Syntax Tree"><br>  注：yacc工具(yacc: Yet Another Compiler Compiler)可实现语法分析，根据用户给定的语法规则对输入的记号序列进行解析，从而构建一个语法树，所以它也被称为“编译器编译器（Compiler Compiler）”。</p>
+</li>
+<li><p>语义分析：编译器所分析的语义是静态语义，所谓静态语义就是指在编译期可以确定的语义，通常包括声明，和类型的匹配，类型的转换。<br>  <img src="/img/3038567-6442508e29911fab.png" alt="Commented Syntax Tree"><br>  注：与之对于的为动态语义分析，只有在运行期才能确定的语义。</p>
+</li>
+<li><p>源代码优化：源代码优化器(Source Code Optimizer)，在源码级别进行优化，例如<code>(2 +  6)</code>这个表达式，其值在编译期就可以确定。优化后的语法树。<br>  <img src="/img/3038567-0ecaf3f188eebe3b.png" alt="Paste_Image.png"><br>  但是直接作用于语法树比较困难，所以源代码优化器往往将整个语法数转化为中间代码（Intermediate Code）。</p>
+<p>  注：中间代码是与目标机器和运行环境无关的。中间代码使得编译器被分为前端和后端。编译器前端(1-4步)负责产生机器无关的中间代码；编译器后端(5-6步)将中间代码转化为目标机器代码。</p>
+</li>
+<li><p>目标代码生成：代码生成器(Code Generator)。</p>
+</li>
+<li><p>目标代码优化：目标代码优化器(Target Code Optimizer)。</p>
+</li>
+</ul>
+<p>最后的俩个步骤十分依赖与目标机器，因为不同的机器有不同的字长，寄存器，整数数据类型和浮点数据类型等。</p>
+<h2 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h2><p>汇编器是将汇编代码转变成机器可以执行的命令，每一个汇编语句几乎都对应一条机器指令。汇编相对于编译过程比较简单，所以根据汇编指令和机器指令的对照表一一翻译即可。汇编过程可以通过以下方式完成。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">as hello.s -o hello.o</span><br></pre></td></tr></table></figure></p>
+<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -c hello.s -o hello.o</span><br></pre></td></tr></table></figure></p>
+<h2 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h2><h3 id="静态链接"><a href="#静态链接" class="headerlink" title="静态链接"></a>静态链接</h3><p>把一个程序分割为多个模块，然后通过某种方式组合形成一个单一的程序，这就是链接。而模块间如何组合的问题，归根到底，就是模块如何进行通信的俩个问题：(1) 模块间的函数调用，(2) 模块间的变量访问。但无论是那一个问题，其本质是获取一个地址，函数运行的地址、或者变量存放的地址。</p>
+<p>如果熟悉汇编的，应该会知道<code>hello.o</code>文件，既目标文件，是以分段的形式组织在一起的。其简单来说，<strong>把程序运行的地址划分为了一段一段的片段，有的片段是用来存放代码，叫代码段，这样，可以给这个段加个只读的权限，防止程序被修改；有的片段用来存放数据，叫数据段，数据经常修改，所以可读写；有的片段用来存放标识符的名字，比如某个变量 ，某个函数，叫符号表；等等。</strong>由于有这么多段，所以为了方便管理，所以又引入了一个段，叫<strong>段表</strong>，方便查找每个段的位置。</p>
+<p>当文件之间相互需要链接的时候，就把相同的段合并，然后把函数，变量地址修改到正确的地址上 。这就是静态链接，如下图。<br><img src="/img/3038567-9115f4e4b6d590fc.png" alt="静态链接"></p>
+<p>但是这里有俩个问题：</p>
+<ul>
+<li><p>对于计算机的内存和磁盘的空间浪费比较严重</p>
+<p>  想想一下，现在一个静态库，至少都是1MB以上。但是假如有1000个或者更多的程序在链接的时候，都静态链接了它，那么当这些程序运行起来的时候，内存中就会存在1000+相同的副本，还是一模一样的。这样，至少1GB空间就浪费了。</p>
+</li>
+<li><p>程序的更新，部署，和发布会带来很多麻烦</p>
+<p>  比如一个程序<code>Program</code>所使用的<code>Lib.o</code>是使用的第三方厂商提供的，那么当该厂商更新了<code>Lib.o</code>（比如修复了一个bug，或者优化了性能），那么<code>Program</code>的厂商就必须要拿到最新版的<code>Lib.o</code>，然后与<code>Program.o</code>链接。将新的<code>Program</code>发给用户。这样，一旦程序任何位置有一个小小的改动，都会导致重新下载整个程序。</p>
+</li>
+</ul>
+<h3 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h3><p>我们的想法很简单，就是当第一个例子在运行时，在内存中只有一个副本；第二个例子在发生时，只需要下载更新后的lib，然后链接，就好了。那么其实，这就是动态链接的基本思想了：<strong>把链接这个过程推迟到运行的时候在进行</strong>。在运行的时候动态的选择加载各种程序模块，这个优点，就是后来被人们用来制作程序的插件(Plug-in)。</p>
+<p>这里，我们不得不介绍一个东西，叫做动态链接器。它会在程序运行的时候，把程序中所有未定义的符号（比如调了动态库的一个函数，或者访问了一个变量）绑定到动态链接库中。简单的来说就是把程序中函数的地址改正到动态库，之后动态链接器会把控制权交给程序，然后程序执行。</p>
+<p>这种在装载时修正地址，经常被称为装载时重定位(Load Time Relocation)。而静态链接时修正，则被称为链接时重定位(Link Time Relocation)。</p>
+<p>可能有的人，就要问了，多个程序应用一个库不会有问题么？变量冲突？是这样的。动态链接文件，把那些需要修改的部分分离了出来，与数据放在了一起，这样指令部分就可以保持不变，而数据部分可以在每个进程中拥有一个副本，这种方案就是目前被称为地址无关代码(PIC，Position-independent Code)的技术。</p>
+<h3 id="链接库"><a href="#链接库" class="headerlink" title="链接库"></a>链接库</h3><p>通过上面，我们了解到了动态链接，静态链接。一组相应目标文件的集合，我们称它为库。因而也就有了静态链接库，动态链接库。</p>
+<ul>
+<li><p>静态链接库：在<code>Linux</code>平台上，常以<code>.a</code>或者<code>.o</code>为拓展名的文件，我们最常用的C语言静态库，就位于<code>/usr/lib/libc.a</code>；而在<code>Windows</code>平台上，常以<code>.lib</code>为拓展名的文件，比如Visual C++附带的多个版本C/C++运行库，在VC安装的目录下的<code>lib\</code>目录。</p>
+</li>
+<li><p>动态链接库：在<code>Linux</code>平台上，动态链接文件为称为动态共享对象(DSO，Dynamic Shared Objects)，简称共享对象。他们一般常以<code>.so</code>为拓展名的文件；而在<code>Windows</code>平台上，动态链接文件被称为动态链接库(DLL，Dynamical Linking Library)，通常就是我们常见的<code>.dll</code>为拓展名的文件。</p>
+</li>
+</ul>
+<h2 id="装载"><a href="#装载" class="headerlink" title="装载"></a>装载</h2><p>介绍装载就不得不介绍三种文件格式了：ELF，PE，COFF。现在PC平台上流行的可执行文件格式(Executable)，无论是<code>Windows</code>下的PE(Portable Executable)文件，还是<code>Linux</code>下的ELF(Executable Linkable Format)文件，都是COFF(Common file format)文件格式的变种。可执行文件例如，<code>Windows</code>下的<code>*.exe</code>,<code>Linux</code>下的<code>/bin/bash</code>。其实目标文件，内部结构上来说和可执行文件的结构几乎是一样的，所以一般跟可执行文件格式一起用一种格式进行存储。</p>
+<p>下面以ELF文件为例子，介绍。</p>
+<p>每一个ELF文件，都会有一个ELF文件头，里面会记录很多关于这个程序相关信息，通过它确定段表，进而确定各个段。总的来说，装载做了以下三件事情：</p>
+<ul>
+<li><p>创建虚拟地址空间</p>
+</li>
+<li><p>读取可执行文件头，并且建立虚拟空间与可执行文件的映射关系</p>
+</li>
+<li><p>将CPU的指令寄存器设置为运行库的初始函数（初始函数不止一个，第一个启动函数为：<code>_start</code>），初始了<code>main()</code>函数的环境，然后指向可执行文件的入口</p>
+</li>
+</ul>
+<hr>
+<p>以上就是最近几天看完《程序员的自我修养》一些感悟吧。<br>└(^o^)┘;</p>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://torival.github.io/2016/11/03/how-did-the-program-work/" data-id="civ2f9z670002ksvt1o5et4i1" class="article-share-link">分享到</a><div class="tags"><a href="/tags/Program/">Program</a></div><div class="post-nav"><a href="/2016/10/09/terminal-query-tickets/" class="next">终端查询12306余票</a></div><div id="disqus_thread"><script>var disqus_shortname = 'Torival';
+var disqus_identifier = '2016/11/03/how-did-the-program-work/';
+var disqus_title = '内功修炼：程序是如何运行起来的';
+var disqus_url = 'http://torival.github.io/2016/11/03/how-did-the-program-work/';
+(function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//Torival.disqus.com/count.js" async></script></div></div></div></div><div class="pure-u-1-4"><div id="sidebar"><div class="widget"><form action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" class="search-form"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://torival.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Essays/">Essays</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Science/">Science</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Python/" style="font-size: 15px;">Python</a> <a href="/tags/Program/" style="font-size: 15px;">Program</a> <a href="/tags/Shell/" style="font-size: 15px;">Shell</a> <a href="/tags/Assembly/" style="font-size: 15px;">Assembly</a> <a href="/tags/C/" style="font-size: 15px;">C</a> <a href="/tags/Blog/" style="font-size: 15px;">Blog</a> <a href="/tags/life/" style="font-size: 15px;">life</a> <a href="/tags/Algorithm/" style="font-size: 15px;">Algorithm</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/11/03/how-did-the-program-work/">内功修炼：程序是如何运行起来的</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/09/terminal-query-tickets/">终端查询12306余票</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/29/reflection-on-life/">不知所云的沉淀</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/17/Shell-programming/">Shell编程指南</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/10/the-c-complex-declaration/">C语言复杂声明</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/27/use-github-page-hexo-Build-blog/">github page + hexo 搭建博客</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/22/base-data-structure/">简单数据结构：list，stack，queue</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/03/assembly-language-01/">CPU简述</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://forrestchang.github.io/" title="forrestchang" target="_blank">forrestchang</a><ul></ul><a href="http://mrnoknow.github.io/" title="Mr.Noknow" target="_blank">Mr.Noknow</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">© <a href="/." rel="nofollow">Torival's blog.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.pack.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="/css/jquery.fancybox.css?v=0.0.0"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
