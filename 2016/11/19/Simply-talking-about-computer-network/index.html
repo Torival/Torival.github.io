@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="个人博客"><title>简单谈谈计算机网络 | Torival's blog</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/3.0.3/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">简单谈谈计算机网络</h1><a id="logo" href="/.">Torival's blog</a><p class="description">Things are beautiful if you love them</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/"><i class="fa fa-user"> 关于</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">简单谈谈计算机网络</h1><div class="post-meta">Nov 19, 2016<span> | </span><span class="category"><a href="/categories/Science/">Science</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> Hits</span></span></div><a data-disqus-identifier="2016/11/19/Simply-talking-about-computer-network/" href="/2016/11/19/Simply-talking-about-computer-network/#disqus_thread" class="disqus-comment-count"></a><div class="post-content"><p>当我们决定要谈谈网络的时候，我想在谈之前，有必要了解一下“协议”这个词。协议，定义了在俩个或者多个通信实体之间交换报文的格式和次序，以及报文发送、接收报文或者其他的事件所采取的动作。定义都比较晦涩，那就让我们来个例子吧。</p>
+<p>假设我要向你（互不相识）询问一下当前的时间；<br>我首先和你说：你好，以示我想要和你交流<code>（发出报文，请求通信）</code>。而你回应我<code>（收到报文，通信建立）</code>：你好，表明能够继续询问你了。我发出询问<code>（发出报文，包含事件处理）</code>：几点了？你看了看表<code>（采取动作）</code>，然后回答我<code>（收到报文，包含结果）</code>，2：00了。之后我说，谢谢<code>（请求结束通信）</code>。你说，不客气<code>（通信结束）</code>。</p>
+<p>以上就是我们日常生活中所使用的协议。相类比计算机，其实也是相差不多的。不同的是，计算机毕竟不是人，所以得指定很多的协议，以保障它们正常的通信。比如以下几个常见的传输协议，当然不了解也没有关系，之后会详细的提及。</p>
+<ul>
+<li><p>超文本传输协议（HTTP，HyperText Transfer Protocol）</p>
+</li>
+<li><p>传输控制协议（TCP，Transmission Control Protocol）</p>
+</li>
+<li><p>因特网协议（IP，Internet Protocol）</p>
+</li>
+<li><p>地址解析协议（ARP，Address Resolution Protocol）</p>
+</li>
+</ul>
+<h2 id="一、网络模型"><a href="#一、网络模型" class="headerlink" title="一、网络模型"></a>一、网络模型</h2><p>既然存在多种协议，那么总需要一种结构把它们合理的组织在一起。而现如今的俩种模型，都是采用的层次结构。每一层通过在该层中执行某些动作或者使用直接下层的服务来提供服务。下面就先来看看这俩类分层结构：<code>五层因特网模型</code>（应用层，运输层，网络层，链路层，物理层）、<code>七层ISO模型</code>（应用层，表示层，会话层，运输层，网络层，链路层，物理层）。<strong>下面我们以五层模型为例，谈谈计算机网络。不过由于物理层涉及比较广，所以我们实际讨论的只有四层：应用层，运输层，网络层，链路层</strong>。<br><img src="/img/3038567-66902fbd2beebe82.png" alt="网络模型"></p>
+<ul>
+<li><p>应用层：就是网络应用程序及它们的应用层协议存在的地方，我们常把位于应用层要传递的信息称为<em>报文（message）</em>。</p>
+</li>
+<li><p>运输层：因特网的运输层负责在俩个应用程序端点之间传递应用层报文。在因特网中，有俩种运输协议，<code>TCP</code>和<code>UDP</code>，使用其中的任何一个都能传递应用层报文，值得注意的是，在这一层，<code>TCP</code>/<code>UDP</code>会把上层报文包装成一个新的结构，我们称为<em>报文段（segment）</em>。</p>
+</li>
+<li><p>网络层：在这一层，网络层也会把上一层的<code>报文段</code>包装成一个被称作<em>数据报（datagram）</em>的结构。然后把这个<code>数据报</code>从一台主机移动到另外一台主机上。在这一层就包括著名的<code>IP</code>协议。</p>
+</li>
+<li><p>链路层：同理，在这一层，又在<code>数据报</code>的外面加了个壳，我们把加壳之后的这个东西叫做<em>帧（frame）</em>。然后通过这一层把<code>帧</code>从当前的一个节点移动到下一个节点，网络层必须依靠链路层的服务。如下图，从源主机到链路交换机。</p>
+</li>
+</ul>
+<p><img src="/img/3038567-87095cf00e6cbf1d.png" alt="信息传递过程"></p>
+<p>在网络中，我们经常会忽略具体的设备，而统一称为主机（host），或者端系统（end system）。比如智能手机，平板电脑，电视，游戏机，web相机等等……而主机与主机之间通过通信链路（communication link）和分组交换机（packet switch）连接在一起。分组交换机各式各样，但当今最著名的类型是路由器（Router）和链路层交换机（Link-layer switch），分别也称为，三层交换机，或者俩层交换机。由上图可以看出。</p>
+<p>最后，来说一个小程序，<code>tracert</code>。通过它，可以确定从你当前的主机到目的主机之间经过了那些交换机。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">## 运行cmd</span><br><span class="line">C:\&gt;tracert baidu.com</span><br><span class="line"></span><br><span class="line">通过最多 30 个跃点跟踪</span><br><span class="line">到 baidu.com [123.125.114.144] 的路由:</span><br><span class="line"></span><br><span class="line">  1     4 ms     4 ms     3 ms  10.205.64.1</span><br><span class="line">  2     4 ms     2 ms     3 ms  192.168.24.2</span><br><span class="line">  3     *       11 ms     8 ms  124.93.192.65</span><br><span class="line">  4   341 ms    88 ms   310 ms  124.93.179.249</span><br><span class="line">  5     9 ms     5 ms     8 ms  61.189.75.13</span><br><span class="line">  6    12 ms    15 ms    14 ms  113.230.185.37</span><br><span class="line">  7    23 ms    22 ms    22 ms  219.158.21.69</span><br><span class="line">  8    24 ms    24 ms    32 ms  202.96.12.14</span><br><span class="line">  9    22 ms    23 ms    21 ms  202.106.34.194</span><br><span class="line"> 10    22 ms    28 ms   154 ms  202.106.43.30</span><br><span class="line"> 11     *        *        *     请求超时。</span><br><span class="line"> 12     *        *        *     请求超时。</span><br><span class="line"> 13    22 ms    22 ms    31 ms  123.125.114.144</span><br><span class="line"></span><br><span class="line">跟踪完成。</span><br></pre></td></tr></table></figure></p>
+<h2 id="二、应用层"><a href="#二、应用层" class="headerlink" title="二、应用层"></a>二、应用层</h2><p>对于应用层，我想绝大多数人，应该是最熟悉的了。尤其是从事软件开发的人。这类应用程序体系结构是由应用程序研发者设计，不过多是利用的现代所流行的俩种主流体系结构之一：C/S结构（客户 - 服务器），P2P结构（对等体系）。</p>
+<ul>
+<li><p>C/S结构：在这种体系中，总有一个需要一直打开的主机，我们称为服务器（server），它服务于其他称为客户（client）主机的请求。服务器总是具有一个固定的地址，大家都知道的地址，称为IP地址。比如<code>baidu.com</code>的IP地址之一为<code>180.149.132.47</code>。啥？你不知道<code>baidu.com</code>的地址，但是你知道<code>baidu.com</code>这个名字吧，又因为存在DNS服务（后面说），所以想当于了解。在这种结构下，值得注意的是，其他客户主机之间是不可以之间进行通信的。</p>
+</li>
+<li><p>P2P结构：在对等（Peer-to-peer）体系中，每台计算机之间都处于对等的地位，各台计算机有相同的功能，无主从之分，一台计算机既可作为服务器，设定共享资源供网络中其他计算机所使用，又可以作为工作站。网络中的每一台计算机既能充当网络服务的请求者，又对其它计算机的请求做出响应，提供资源、服务和内容。通常这些资源和服务包括：信息的共享和交换、计算资源（如CPU计算能力共享）、存储共享（如缓存和磁盘空间的使用）、网络共享、打印机共享等。</p>
+</li>
+</ul>
+<h3 id="2x01-是什么在通信"><a href="#2x01-是什么在通信" class="headerlink" title="2x01.是什么在通信"></a>2x01.是什么在通信</h3><p>对于学习过操作系统，或阅读过unix网络编程的人，对Tcp echo服务器应该不会陌生。当前进程通过fork()生成另外一个进程，一个进程发送一句话，然后另外一个接收到，并且显示在屏幕上。所以，我们可以想得到，在应用层而言，忽略下层数据传输细节，那么通信的其实就是进程。然而我们不怎么关注同一台主机上进程间的通信，而关注不同端系统上的进程间的通信。那么就不得不一个新东西：<strong>套接字</strong>，主机上应用层与运输层的接口，但是应用程序开发者对于运输层的控制仅限于：</p>
+<ul>
+<li>选择运输层的协议</li>
+<li>也许能设定几个运输层的参数，比如最大换成数，和最大报文段长度等。</li>
+</ul>
+<h3 id="2x02-网络应用"><a href="#2x02-网络应用" class="headerlink" title="2x02.网络应用"></a>2x02.网络应用</h3><p>互联网从诞生到现在不过短短百年，但是对于人类社会的影响确实翻天覆地。试想，一百年前的时候，你能身处中华，却知道美国现在发生着选举大会吗？你能通过一个东西随身携带万卷书吗？你能实时与你远在他乡的好友实时通讯吗？不能，都不能。但是现在可以。那么接下来，就介绍几个极为流行的应用以及它的应用层协议吧。</p>
+<ul>
+<li><p>HTTP：Hyper Text Transfer Protocol（超文本传输协议）的缩写。常有俩个程序实现，客户机-服务器，并且分别运行在不同的端系统上。其下的支撑运输协议是使用的TCP，而且由于http服务器并不保存关于客户的任何信息，所以<code>http</code>也被称为是一个无状态协议。但是为了跟踪用户的输入（比如用户的购物车商品），网站会提供一个用户身份的识别码，存放在cookie中，每次再访问网站则自动将cookie加入到HTTP报文头部，实现身份的识别。<br><img src="/img/3038567-5e1b4b9550f0b269.png" alt="交互过程"></p>
+</li>
+<li><p>FTP：File Transfer Protocol（文件传输协议）的英文简称，而中文简称为“文传协议”。同时，它也是一个应用程序。通过使用俩个并行的TCP链接来传输文件，一个是控制链接，一个是数据链接，控制链接用于在俩个主机之间传输控制信息，如用户标识，口令，命令。数据链接用于实际发送一个。</p>
+</li>
+<li><p>DNS：Domain Name System（域名系统）的缩写，运行在UDP协议之上。就像我们上面提到的<code>baidu.com</code>怎么转换成ip地址，这个就是DNS的服务。下面来介绍一下。首先，总的来说，DNS采用了分布式的设计方案。如下。<br><img src="/img/3038567-b233c498937d4fe2.png" alt="DNS服务器层次结构"><br>每个组织，如一个大学，一个院系，一个公司都会有一台本地DNS服务器，当一台主机想要访问<code>baidu.com</code>的ip地址时，会先发送她的查询请求到本地DNS服务器，里面查找是否有<code>baidu.com</code>的ip地址。没有的话，本地DNS服务器就把这个请求转发到根DNS服务器，然后根DNS服务器把<code>com</code>DNS服务器地址发送给本地DNS服务器，然后本地DNS服务器发送查询请求到<code>com</code>DNS服务器，完成名字与ip地址的转换。</p>
+</li>
+</ul>
+<p>如果你想在你的主机上发送一个DNS查询报文，那么就使用<code>nslookup</code>程序吧，它可以帮助你完成，前俩行是你的主机的DNS服务器的名字，以及ip地址。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">## 运行cmd</span><br><span class="line">C:\&gt; nslookup baidu.com</span><br><span class="line">服务器:  cache3-dlcity</span><br><span class="line">Address:  202.96.69.38</span><br><span class="line"></span><br><span class="line">非权威应答:</span><br><span class="line">名称:    baidu.com</span><br><span class="line">Addresses:180.149.132.47</span><br><span class="line">          123.125.114.144</span><br><span class="line">          220.181.57.217</span><br><span class="line">          111.13.101.208</span><br></pre></td></tr></table></figure></p>
+<h2 id="三、运输层"><a href="#三、运输层" class="headerlink" title="三、运输层"></a>三、运输层</h2><p>运输层协议为运行在不同的主机上的应用进程之间提供了逻辑通信，不需要考虑下层的实现细节，即使是相隔很远，也可以通过运用运输层的接口彼此发送报文。所以运输层协议是在端系统上而不是在路由器上。我们通过应用层，都知道，俩个主机之间通信就是俩个进程在通信。但是我们的电脑经常运行着很多的软件，QQ、网易云音乐、chrome…….那么怎么保证它们正常接收到自己的数据包呢？这里就要提出一个叫做端口的东西。<strong>端口</strong>，是一个16比特的数，其大小在0-65535之间，但是0-1023范围的端口称为公认端口，它们紧密绑定于一些服务。通常这些端口的通讯明确表明了某种服务的协议。例如：80端口实际上总是HTTP通讯，FTP一般使用端口（20，21），53为DNS服务的端口等等。</p>
+<p>多路复用/分解：一个进程可以有一个或者多个套接字，就像FTP，但是一般一个套接字值绑定只一个端口号，那么在同一个时刻，一定存在着多个套接字，所以每个套接字都有自己唯一的标识符。用来区别于其他套接字。这样运输层就可以把不同的报文数据交付到正确的套接字上面，称为<em>多路分解</em>。而不同的套接字加上各种的壳，从而生成报文段，然后将报文段传递到网络层，称为<em>多路复用</em>。</p>
+<h3 id="3x01-UDP"><a href="#3x01-UDP" class="headerlink" title="3x01.UDP"></a>3x01.UDP</h3><p>为了说清楚UDP（User Datagram Protocol）协议，我想有必要简单的说明一下网络层的<code>IP</code>协议。<code>IP</code>协议的服务模型为尽力而为交付服务，这就意味着IP尽它“最大的努力”在通信的主机之间交付报文，但它不会做任何的保证。不保证报文段的交付，不保证报文段的按序交付，不保证报文段中数据的完整性。所以<code>IP</code>协议也被称为是<em>不可靠服务</em>。</p>
+<p>就像<code>IP</code>协议是不可靠协议一般，<code>UDP</code>也是如此。但是尽管如此，有一些场合，还是很适合<code>UDP</code>的，比如交谈式音频/视频，这些应用能够承受一定程度的数据损失，因为那丢失的数据对于播放出现的干扰，并不是很致命。如果说应用程序开发人员在开发时选择了<code>UDP</code>，那么这个应用差不多就是直接与<code>IP</code>协议打交道了。我知道，你想说，既然UDP这么不好，为什么编程有时还选择这个。那是因为UDP在传输的速度上要很大的优于TCP协议。TCP提供很多的保障，但是保障的背后就是时间的代价。就像在相同算法下，C语言与其他高级语言运行时间明显有差别。<br><img src="/img/3038567-f040e0f39b8c9ab5.png" alt="UDP报文段结构"></p>
+<p>上图为UDP报文段结构，我们可以看出，相比较上层（应用层）传来的报文，多了四个字节，分别为，源端口号，目的端口号，长度（报文），校验和。通过后俩个传输数据，确定是否在移动中，其中的比特发生了改变。比如链路中的噪音干扰，或者存储在路由器时引入问题。有人可能会说怎么这个报文段里面没有对方或者自己的IP地址，那时因为IP地址是在下一层包装进去的。</p>
+<h3 id="3x02-TCP"><a href="#3x02-TCP" class="headerlink" title="3x02.TCP"></a>3x02.TCP</h3><p>tcp（Transmission Control Protocol）协议相比叫UDP协议，最为重要的就是比UDP多了俩项功能。</p>
+<ul>
+<li><p>可靠传输。保证数据正确、按序到达。虽然UDP不能保证，但是可以在上层应用程序里建立自己的可靠机制来完成。</p>
+</li>
+<li><p>拥堵控制。由于UDP没有限制发送报文段，所以导致UDP发送方和接受方之间的高丢包率，并挤跨了TCP的会话。<br><img src="/img/3038567-e6477a4a65fdbb8d.png" alt="TCP报文段结构"></p>
+</li>
+</ul>
+<p><strong>三次握手</strong>：</p>
+<ul>
+<li><p>在报文段的首部中的一个标志位<code>SYN</code>被置为1，所以，有时也称其为SYN报文段，另外，客户会随机的选择一个初始序号（client_isn）并放到序号（Sequence number） 。然后发送给服务器。</p>
+</li>
+<li><p>服务器会从该数据报中提取<code>SYN</code>报文段，并且为TCP连接分配TCP缓存和变量，并向该TCP发送允许连接的报文段。其具体为：首先，<code>SYN</code>置为1；其次，首部的确认字段（Acknowledgment number）被置为（client_isn + 1），最后会选择自己的初始序号（server_isn）放到序号（Sequence number） 。然后发送给客户机。有时也称这个报文段为<strong>SYN报文段（SYNACK segment）</strong>。</p>
+</li>
+<li><p>在客户机收到SYN报文段后，客户机也要给该连接分配缓存和变量，然后给服务器发送一个确认报文段。对服务器的允许连接的报文段进行确认。连接建立之后，该SYN被置为0。<br>  <img src="/img/3038567-efbf078af5d9efe9.png" alt="三次握手"></p>
+</li>
+</ul>
+<p><strong>四次挥手</strong>：</p>
+<ul>
+<li><p>客户机想服务器发送一个特殊的报文段，这个报文段让其首部的标志位<code>FIN</code>被置为1，然后发送给服务器。</p>
+</li>
+<li><p>当服务器接受到该报文的时候，就向客户机发送一个确定报文。</p>
+</li>
+<li><p>服务器发送自己的终止报文段，其<code>FIN</code>被置为1。</p>
+</li>
+<li><p>客户机对这个服务器终止报文段进行确认。<br><img src="/img/3038567-3ff24567ea328024.png" alt="四次挥手"><br>由于TCP并没有提供任何的加密机制，所以现在研制了TCP的加强版本，称为安全套接字（Secure Sockets Layer，SSL）。用SSL加强后的TCP不仅能够完成传统TCP所能做的一切，而且提供了关键的进程到进程的安全性服务。</p>
+</li>
+</ul>
+<h2 id="四、网络层"><a href="#四、网络层" class="headerlink" title="四、网络层"></a>四、网络层</h2><p>网络层的作用从表面上看极为简单，就是把数据报从一台主机移动到另外一台主机上，为此，需要俩种重要的功能。当然，这一层有上面提到的<code>IP</code>（Internet Protocol）协议。</p>
+<ul>
+<li><p>转发。数据报从单一的路由器中从一条入链路到出链路的传送。</p>
+</li>
+<li><p>路由选择。一个网络中所有的路由器，它们经路由选择协议共同交互，以决定数据报从源到目的地所采用的路径。</p>
+</li>
+</ul>
+<p><img src="/img/3038567-aa0a6d7928cd5162.png" alt="转发"></p>
+<p>在实际的网络中，每一个路由器，都会有多个输入端，就像（A，B），和多个输出端。并且在输入端使用了<strong>存储转发传输机制</strong>，这种机制是指在每个路由器能够开始向输出端传输该数据报的第一个比特之前，必须接受整个数据报。而在每一个输出端，都具有一个输出队列，它用于存储路由器准备发送到这个输出端的数据报。当然，既然是队列，还是在实际情况下，那么总会有输出队列被充满的时候，这个时候就会出现<strong>丢包</strong>（packet lost），到达的数据报或者已经在排队的数据报之一会被丢弃。</p>
+<h3 id="4x01-IPv4编址"><a href="#4x01-IPv4编址" class="headerlink" title="4x01.IPv4编址"></a>4x01.IPv4编址</h3><p>我们知道，主机，路由器是通过一条条的物理链路链接在一起，而主机/路由器与物理链路的边界，我们常称其为<em>接口</em>。在ip协议中，要求每台主机/路由器的每个接口都拥有自己的ip地址，也就是说，一个路由器可能有多个ip地址。在IPv4中，规定IP地址长度为32比特，等价于四个字节。每字节最大255，所以ip最大为<code>255.255.255.255</code>。这些地址一般使用所谓的<code>点分十进制记法</code>书写，即地址中的每个字节用它的十进制书写，各字节之间以句点隔开。例如<code>127.0.0.1</code>。<br><img src="/img/3038567-7617c71b52c35237.png" alt="IPv4编址"><br>用ip的术语来说，互联的三个主机和一个路由器接口形成一个<em>子网</em>。ip编址为这个子网分配了一个地址：<code>233.1.1.0/24</code>，其中/24记法，有时也被称为<em>子网掩码</em>，指示了32比特中的最左24比特定义了子网地址。其他要连接在这个<code>233.1.1.0/24</code>网络的主机，其地址要求具有<code>233.1.1.xxx</code>的形式。ip地址通过限制特定长度的比特，对ip进行分类编址。如下。</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th style="text-align:center">范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td style="text-align:center">0.0.0.0 - 127.255.255.255</td>
+</tr>
+<tr>
+<td>B</td>
+<td style="text-align:center">128.0.0.0 - 191.255.255.255</td>
+</tr>
+<tr>
+<td>C</td>
+<td style="text-align:center">192.0.0.0 - 223.255.255.255</td>
+</tr>
+<tr>
+<td>D</td>
+<td style="text-align:center">224.0.0.0 - 239.255.255.255</td>
+</tr>
+<tr>
+<td>E</td>
+<td style="text-align:center">240.0.0.0 - 255.255.255.255</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4x02-DHCP"><a href="#4x02-DHCP" class="headerlink" title="4x02.DHCP"></a>4x02.DHCP</h3><p>试想，如果一个组织一旦获得一块地址，那么它就可以为本组织内的主机与路由器接口逐个分配ip地址。那么就不得不提出DHCP（Dynamic Host Configuration Protocol，动态主机配置协议）协议了。DHCP具有将主机连接进一个网络的网络相关方面的自动能力，在早期，对于网络管理员，不得不手动执行这些认为任务，所以它的出现对于网络管理员非常吸引。<br><img src="/img/3038567-b278597bb88b8a55.png" alt="DNCP服务器"></p>
+<p><strong>DHCP建立过程：</strong></p>
+<ul>
+<li><p>DHCP客户端发送<code>DHCP discover</code>消息（IP地址租用申请），这个消息是通过广播方式发送出去的，所有网络中的DHCP服务器都将接收到这个消息。  </p>
+</li>
+<li><p>网络中的DHCP服务器会回应一个<code>DHCP offer</code>消息（IP地址租用提供），由于这个时候客户端还没有网络地址，所以<code>DHCP offer</code>也是通过广播的方式发送出去的。需要注意的是，由于网络中可能存在不止一台的DHCP服务器，所以，如果不考虑网络丢包的话，客户端将接收到不止一条的<code>DHCP offer</code>消息。那么客户端会选择它接收到的第一条<code>DHCP offer</code>作为获取配置的服务器。 </p>
+</li>
+<li><p>客户机向该服务器发送<code>DHCP request</code>消息。虽然这个时候客户端已经明确知道选择的DHCP服务器的地址所在，但仍将采用广播的方式发送<code>DHCP request</code>消息，这样做不仅可以通知选中的服务器向客户端分配IP地址，同时也可以通知其他没有选中的DHCP服务器不需要再响应它的请求。在<code>DHCP request</code>消息中将包含客户端申请的IP地址。 </p>
+</li>
+<li><p>DHCP服务器将回送<code>DHCP ACK</code>的响应消息对请求报文进行响应。<br><img src="/img/3038567-ea8c438f06c5dcc6.png" alt="DHCP客户-服务器交互"></p>
+</li>
+</ul>
+<h2 id="链路层"><a href="#链路层" class="headerlink" title="链路层"></a>链路层</h2><p>对于一个主机体系结构，链路层的主题部分是在网络适配器中实现的（有时也被称为网络接口卡）。而在网络适配器也具有自己的链路层地址。链路层的地址有各种不同的叫法：<strong>LAN地址（LAN address），物理地址（physical address），MAC地址（MAC 地址）</strong>。</p>
+<p>既然有了网络层ip地址，为什么还要链路层的mac地址？那是因为要保证每层的独立性，假如在链路层的上层不是网络层，那么链路层该如何寻址？所以引入mac 地址。</p>
+<p>那么在网络层和链路层之间适合转化的呢。这就是地址解析协议（ARP，Address Resolution Protocol）的功劳。ARP将一个ip地址解析为MAC地址的时候，很多方面与DNS类似。虽然DNS是将主机名解析成ip地址。<br><img src="/img/3038567-7f22435a1277f38c.png" alt="ip-mac地址"></p>
+<hr>
+<p>以上内容是最近看了几本书网络书籍的部分总结：</p>
+<ul>
+<li>《计算机网络：自顶向下方法》 v6</li>
+<li>《TCP/IP详解 卷一：协议》 v1</li>
+</ul>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://torival.github.io/2016/11/19/Simply-talking-about-computer-network/" data-id="civoit4q80001movtugarmqr0" class="article-share-link">分享到</a><div class="tags"><a href="/tags/Network/">Network</a></div><div class="post-nav"><a href="/2016/11/03/how-did-the-program-work/" class="next">内功修炼：程序是如何运行起来的</a></div><div id="disqus_thread"><script>var disqus_shortname = 'Torival';
+var disqus_identifier = '2016/11/19/Simply-talking-about-computer-network/';
+var disqus_title = '简单谈谈计算机网络';
+var disqus_url = 'http://torival.github.io/2016/11/19/Simply-talking-about-computer-network/';
+(function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//Torival.disqus.com/count.js" async></script></div></div></div></div><div class="pure-u-1-4"><div id="sidebar"><div class="widget"><form action="//www.google.com/search" method="get" accept-charset="utf-8" target="_blank" class="search-form"><input type="text" name="q" maxlength="20" placeholder="Search"/><input type="hidden" name="sitesearch" value="http://torival.github.io"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Essays/">Essays</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Science/">Science</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Shell/" style="font-size: 15px;">Shell</a> <a href="/tags/Network/" style="font-size: 15px;">Network</a> <a href="/tags/Algorithm/" style="font-size: 15px;">Algorithm</a> <a href="/tags/Assembly/" style="font-size: 15px;">Assembly</a> <a href="/tags/Program/" style="font-size: 15px;">Program</a> <a href="/tags/life/" style="font-size: 15px;">life</a> <a href="/tags/Python/" style="font-size: 15px;">Python</a> <a href="/tags/C/" style="font-size: 15px;">C</a> <a href="/tags/Blog/" style="font-size: 15px;">Blog</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/11/19/Simply-talking-about-computer-network/">简单谈谈计算机网络</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/11/03/how-did-the-program-work/">内功修炼：程序是如何运行起来的</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/10/09/terminal-query-tickets/">终端查询12306余票</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/29/reflection-on-life/">不知所云的沉淀</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/17/Shell-programming/">Shell编程指南</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/09/10/the-c-complex-declaration/">C语言复杂声明</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/27/use-github-page-hexo-Build-blog/">github page + hexo 搭建博客</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/22/base-data-structure/">简单数据结构：list，stack，queue</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/03/assembly-language-01/">CPU简述</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://forrestchang.github.io/" title="forrestchang" target="_blank">forrestchang</a><ul></ul><a href="http://mrnoknow.github.io/" title="Mr.Noknow" target="_blank">Mr.Noknow</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">© <a href="/." rel="nofollow">Torival's blog.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.pack.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="/css/jquery.fancybox.css?v=0.0.0"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
